@@ -211,6 +211,7 @@ class Tree(object):
 
         return terminal_node
 
+    # the only thing need to update here is calculate the data_coor1 also for relation1 and put it in the weight
     def update_particle(self, particle_num, current_tree, max_stage, budget, data_coor, relation, dim_num):
         # By Caoyuan Here can use self instead of dts_star to save memory
         # print("In dts_update Now==")
@@ -260,10 +261,15 @@ class Tree(object):
             # likelihood is different
 
             if hd_i >= len(self.candidate_set):
-                ll_val_i = (self.ll_cal(data_coor, relation, self.node_num_seq[-1]))
+                # please be careful about the dimensions, sequence extraction, e.t.c...
+                ll_val_i0 = (self.ll_cal(data_coor0, relation0, self.node_num_seq[-1]))
+                ll_val_i1 = (self.ll_cal(data_coor1, relation1, self.node_num_seq[-1]))
+                ll_val_i = ll_val_i0 + ll_val_i1
             else:
                 continue_flag = True
-                ll_val_i = (self.ll_cal(data_coor, relation, self.node_num_seq[hd_i]))
+                ll_val_i0 = (self.ll_cal(data_coor0, relation0, self.node_num_seq[hd_i]))
+                ll_val_i1 = (self.ll_cal(data_coor1, relation1, self.node_num_seq[hd_i]))
+                ll_val_i = ll_val_i0 + ll_val_i1
 
             ll_seqi.append(ll_val_i)
             # print('Likelihood of all trees: ll_seqi--->', ll_seqi)

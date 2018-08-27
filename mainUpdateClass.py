@@ -25,6 +25,10 @@ def main():
         print('i-th file', count)
         count += 1
         _, data_num, data_coor, relation, x_data_coor, y_data_coor = load_data(folder+os.sep+file_name)
+        # Add another reltaional data1 and coordinates
+        _, data_num, data_coor1, relation1, x_data_coor, y_data_coor = load_data(folder+os.sep+file_name)
+        
+        # update data_coor1 the same as data_coor
         train_data_ind = np.where(relation < 2)[0]
         train_relation = relation[train_data_ind]
         train_data_coor = data_coor[train_data_ind, :]
@@ -80,8 +84,12 @@ def main():
             # print('    Update coors')
             print('Start to update coor i-th: ', itei)
             for j in range(internal_round):
+                
                 trainll, auc, data_coor = update_coors_one(tree, trainll, train_data_ind, test_data_ind, train_relation,
                                                            test_relation, data_coor, data_num, beta)
+                # Also update data_coor1, use the same tree structure
+                trainll, auc, data_coor1 = update_coors_one(tree, trainll, train_data_ind, test_data_ind, train_relation1,
+                                                           test_relation1, data_coor1, data_num, beta)
             # train_relation is never changed so no need to update, but train data coor should be updated
             train_data_coor = data_coor[train_data_ind, :]
             # trainll, auc, xDataCoor, yDataCoor = update_coors(tree, x_data_coor, y_data_coor, relation, data_num, beta, relation_matrix)
@@ -92,10 +100,11 @@ def main():
             current_tree = copy.deepcopy(tree)
             #  divide training data, use training data only to update particles
             # print('Start to update particle i-th: ', itei)
-            trainll = tree.update_particle(particle_num, current_tree, max_stage, budget, train_data_coor,
-                                           train_relation,
+            # train_realatoin_seq denotes a desequence of all the relations, train_data_coor_seq denotes the sequence of all the data coor
+            trainll = tree.update_particle(particle_num, current_tree, max_stage, budget, train_data_coor_seq,
+                                           train_relation_seq,
                                            dim_num)
-            # print('End of update particle i-th: ', itei)
+                        # print('End of update particle i-th: ', itei)
             # print('After update particle, raining loglikelihood is: ', trainll)
             # print('After update, the number of the CUTS: ', len(tree.node_num_seq))
             #print('After update, Nodes are: ', tree.candidate_set[-1])
